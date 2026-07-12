@@ -47,6 +47,7 @@ type Analytics = {
 type State = {
   stats: Stats; settings: AdminSettings; logs: LookupLog[];
   blocklist: Blocked[]; users: UserSummary[]; analytics: Analytics;
+  health?: { ok: boolean; persistent: boolean; mode: "database" | "memory"; message: string; lastError?: string };
 };
 const ADMIN_TOKEN_KEY = "vx_admin_session";
 
@@ -311,6 +312,23 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
         {fetchErr && (
           <div className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">
             {fetchErr}
+          </div>
+        )}
+
+        {state.health && !state.health.persistent && (
+          <div className="mt-4 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs text-amber-100">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+              <div>
+                <div className="font-semibold">Temporary storage mode active</div>
+                <div className="mt-0.5 text-amber-100/80">{state.health.message}</div>
+                {state.health.lastError && (
+                  <div className="mt-2 rounded-md border border-amber-300/20 bg-black/25 px-2 py-1 font-mono text-[11px] text-amber-50/80">
+                    {state.health.lastError}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
